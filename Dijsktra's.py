@@ -1,139 +1,119 @@
 import math
 import copy
 
-graph = {}
-#nodes
-graph["Start"] = {}
-graph["A"] = {}
-graph["B"] = {}
-graph["End"] = {}
-#node connections
-graph["Start"]["A"] = 6
-graph["Start"]["B"] = 2
-graph["A"]["End"] = 1
-graph["B"]["A"] = 3
-graph["B"]["End"] = 5
 
 
-#2/5/18
-def DijstrasAlgo(graph, startNode):
+
+def searchForLeastCost(costs, processed):
+    lowestCost = math.inf
+    lowestCostNode = None
+    for node in costs:
+        cost = costs[node]
+        #check if cheapest
+        if cost < lowestCost and node not in processed:
+            lowestCost = cost
+            lowestCostNode = node
+    return(lowestCostNode)
+
+def formulate(graph, startNode):
+    costs = {}
     parents = {}
-    shortest = {}
-    solved = []
-    solved.append(startNode)
-
-    #creating the shortest dict
-    for x in graph:
-        shortest[x] = math.inf
-
-    #adding costs for start node
-    shortest[startNode] = 0
-    for y in graph[startNode]:
-        shortest[y] = graph[startNode][y]
-
+    processed = []
+    #making costs
+    for w in graph:
+        costs[w] = math.inf
+    #adding costs from start node
+    costs[startNode] = 0
+    for x in graph[startNode]:
+        costs[x] = graph[startNode][x]
     #creating parents
-    parents = {}
-    for z in graph:
-        parents[z] = None
-        
-    #adding all known node parents
-    for c in graph[startNode]:
-        parents[c] = startNode
+    for y in graph:
+        parents[y] = None
+    #adding parents from start node
+    parents[startNode] = 0
+    for z in graph[startNode]:
+        parents[z] = startNode
+    #creating processed
+    processed.append(startNode)
+    return(parents, costs, processed)
 
-    nextNode = startNode
-    for l in graph:
-        proCheck = False
-        #shortest from node
-        while proCheck == False:
-            nextNodeList = copy.deepcopy(graph[nextNode])
-            node = min(nextNodeList, key=nextNodeList.get)
-            print("Lowest cost from", startNode, "to node", node, "is", graph[startNode][node])
-            if node in solved:
-                proCheck = False
-                nextNodeList[node] = math.inf
-            else:
-                proCheck = True
-        #neighbours of node
+def dijkstra(graph, startNode):
+    parents, costs, processed = formulate(graph, startNode)
+    node = searchForLeastCost(costs, processed)
+    #if while loop over nodes all processed
+    while node is not None:
+        #get all neighbours from node & their total costs
+        cost = costs[node]
         neighbours = graph[node]
-        print("Node", node, "is neighbours with", neighbours)
-
-        #updating shortest path from node
-        for x in neighbours:
-            print("node", x, graph[node][x])
-            currentNodeCost = shortest[node]
-            newCost = currentNodeCost + graph[node][x]
-            if newCost < shortest[x]:
-                shortest[x] = newCost
-                parents[x] = node
-        print(shortest)
+        for n in neighbours:
+            newCost = cost + neighbours[n]
+            #if newcost less than previous noted 'shortest' cost...
+            if costs[n] > newCost:
+                #then update costs and parents to say so
+                costs[n] = newCost
+                parents[n] = node
+        #now all neighbours noted node has been processed
+        processed.append(node)
+        #find next node
+        node = searchForLeastCost(costs, processed)
+    return(parents, costs, processed)
         
-        solved.append(node)
-        
-    print(shortest)
-        
+def main():
+    target = "End"
+    #make graph
+    graph = {}
+    #nodes
+    graph["Start"] = {}
+    graph["A"] = {}
+    graph["B"] = {}
+    graph["End"] = {}
+    #node connections
+    graph["Start"]["A"] = 6
+    graph["Start"]["B"] = 2
+    graph["A"]["End"] = 1
+    graph["B"]["A"] = 3
+    graph["B"]["End"] = 5
 
-
-
-
-
-
-DijstrasAlgo(graph, "Start")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-#display
-print(graph.keys())
-for x in graph:
-    print("Node: ", x)
-    print("Connected to")
-    for y in graph[x]:
-        print(y, "distance =",graph[x][y])
-    print("\n")
-
-
-#path
-infinity = math.inf #float("inf")
-shortest = {}
-for x in graph:
-    shortest[x] = infinity #infinity as no path found as of yet
-
-current_node = None # current node of iteration
-next_nodes = []
-
-order = ["Start","A","B","End"]
-startNode = order[0]
-
-
-for x in order:
-    for y in graph[x]:
-        if len(next_nodes) == 0 or graph["Start"][next_nodes[len(next_nodes)-1]] > graph["Start"][y]:
-            next_nodes.insert(0, y)
-        else:
+    #use dijkstras
+    parents, costs, processed = dijkstra(graph, "Start")
+    #give answer
+    travelList = [target]
+    parent = parents[target]
+    if parent == 0:
+        pass
+    else:
+        travelList.insert(0, parent)
+    while parent != 0:
+        parent = parents[parent]
+        if parent == 0:
             pass
+        else:
+            travelList.insert(0, parent)
+    #formatting the answers
+    print("The path of "+", ".join(travelList)+" was taken")
+    print("With a total cost of "+str(costs[target]))
+    print("The nodes were processed in the order "+", ".join(parents))
 
+main()
     
-print(min(graph[startNode], key=graph[startNode].get)) #gets shortest from nbode
-print(shortest)
-'''
+        
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
