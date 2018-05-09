@@ -1,5 +1,6 @@
 import math
 import copy
+import time
 
 
 
@@ -59,6 +60,7 @@ def dijkstra(graph, startNode):
     return(parents, costs, processed)
         
 def main():
+    '''
     target = "End"
     #make graph
     graph = {}
@@ -73,9 +75,57 @@ def main():
     graph["A"]["End"] = 1
     graph["B"]["A"] = 3
     graph["B"]["End"] = 5
+    '''
+    
+    #travelling salesman
+    #make graph
+    graph = {}
+    #nodes
+    graph["A"] = {}
+    graph["B"] = {}
+    graph["C"] = {}
+    graph["D"] = {}
+    graph["E"] = {}
+    graph["F"] = {}
+    #node connections
+    graph["A"]["B"] = 5
+    graph["A"]["C"] = 3
+    graph["A"]["D"] = 3
+    graph["B"]["A"] = 5
+    graph["B"]["F"] = 2
+    graph["C"]["A"] = 3
+    graph["C"]["F"] = 3
+    graph["C"]["E"] = 3
+    graph["D"]["A"] = 3
+    graph["D"]["E"] = 2
+    graph["E"]["C"] = 3
+    graph["E"]["D"] = 2
+    graph["F"]["B"] = 2
+    graph["F"]["C"] = 3
+    
+    graphList = []
+    for v in graph:
+        graphList.append(v)
+    graphString = ", ".join(graphList)
+    print("The nodes are", graphString)
+    inputLoop = True
+    while inputLoop == True:
+        startNode = input("Please enter the start node: \n").upper()
+        targetNode = input("Please enter the target node: \n").upper()
+        if startNode in graph and targetNode in graph:
+            print("\n")
+            target = targetNode
+            inputLoop = False
+        else:
+            print("\nPlease enter a nodes in the graph")
+            
 
-    #use dijkstras
-    parents, costs, processed = dijkstra(graph, "Start")
+    #Start the clock!
+    startTime = time.time()
+    #use dijkstras                              
+    parents, costs, processed = dijkstra(graph, startNode) # Node must be in graph
+    #Stop the clock!
+    endTime = time.time() - startTime
     #give answer
     travelList = [target]
     parent = parents[target]
@@ -93,8 +143,18 @@ def main():
     print("The path of "+", ".join(travelList)+" was taken")
     print("With a total cost of "+str(costs[target]))
     print("The nodes were processed in the order "+", ".join(parents))
+    
+    print("The program took", endTime , "second/s")
 
-main()
+mainLoop = True
+print("----------- Welcome To Dijsktra's Algorithm -----------")
+while mainLoop == True:
+    main()
+    print("\n")
+    userSelect = input("Please press enter to continue, or E to exit")
+    if userSelect == "e" or userSelect == "E":
+        mainLoop = False
+    
     
         
     
